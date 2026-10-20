@@ -1,0 +1,47 @@
+{
+  "region": {
+    "South (TX, OK, AR, LA, KY, TN, MS, AL, WV, DC, MD, DE, VA, NC, SC, GA, FL)": 834,
+    "West (WA, OR, ID, MT, WY, CA, NV, UT, CO, AZ, NM)": 494,
+    "Midwest (ND, SD, NE, KS, MN, IA, MO, WI, IL, MI, IN, OH)": 372,
+    "Northeast (PA, NY, NJ, RI, CT, MA, VT, NH, ME)": 342,
+    "Pacific (HI, AK)": 16
+  },
+  "sex": {
+    "Female": 1044,
+    "Male": 1014
+  },
+  "age": {
+    "30-49": 735,
+    "50-64": 658,
+    "18-29": 388,
+    "65+": 277
+  },
+  "education": {
+    "College graduate/some postgrad": 735,
+    "Some college, no degree": 468,
+    "Postgraduate": 313,
+    "High school graduate": 272,
+    "Associate's degree": 253,
+    "Less than high school": 17
+  },
+  "race": {
+    "White": 1361,
+    "Black": 251,
+    "Hispanic": 194,
+    "Asian": 140,
+    "Other": 112
+  },
+  "party": {
+    "Democrat": 847,
+    "Independent": 609,
+    "Republican": 540,
+    "Something else": 62
+  },
+  "income": {
+    "$100,000 or more": 552,
+    "$30,000-$50,000": 412,
+    "$50,000-$75,000": 411,
+    "Less than $30,000": 367,
+    "$75,000-$100,000": 316
+  }
+}

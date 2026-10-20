@@ -1,0 +1,11 @@
+{
+  "people": 2058,
+  "persona_chars_p50": 95204.5,
+  "persona_chars_p95": 96256.45,
+  "persona_tokens_p50": 23801.125,
+  "persona_tokens_p95": 24064.1125,
+  "over_8k_tokens": 1.0,
+  "over_32k_tokens": 0.0,
+  "summary_chars_p50": 12993.0,
+  "full_persona_text_chars_p50": 128665.0
+}

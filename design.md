@@ -1,67 +1,75 @@
-# 任务
+# Task
 
-用同一个人在 wave 1–3 中、不会在 wave 4 再出现的回答作为 persona，预测他在 wave 4 的回答。成绩同时对照 wave 4 真值，以及这个人自己的 test-retest 上限。
+Predict how the same person answers the wave-4 questions, using only their wave 1–3 answers to questions wave 4 does not repeat. Compare the prediction with the wave-4 answer and with that person's own test-retest.
 
-预测用 Hugging Face 的 `wave_split`。`full_persona` 只用来认识 block 结构：两边都出现过的题，它保留的是 wave 4 的答案。
+Use Hugging Face `wave_split`. Use `full_persona` only to read the block list. Repeated questions there keep the wave-4 answer.
 
-# 数据探索
+# Exploration
 
-探索要决定 persona 里放什么、每类题怎么打分、人自己有多不稳定。先用大约 100 人把流程跑通，再扩大。
+Done. Tables and the Census comparison are in [report/exploration.md](report/exploration.md). Reproduce with `.venv/bin/python -m exploration.explore`.
 
-要做的：
+What the run changed in the plan:
 
-- 把 `wave4_Q_wave1_3_A` 和 `wave4_Q_wave4_A` 按人、按题对齐。二元题看是否一致，数值题用 1 减去绝对误差除以取值范围。先报全体，再按 block 拆开。这是最重要的一张表。
-- Wave 4 的互斥变体（Element 14–28）一个人只看到一种。缺的 block 是实验分配，不填补，也不把同一组的变体合成一个特征。
-- 比较 persona 全文和摘要的长度，判断小模型的上下文装不装得下。
-- 用同一套打分函数，给数据集里已经算好的 GPT-4.1-mini 仿真打分，得到官方 prompt 方法在这一批人上的数字。
+- Headline human ceiling on our scorer: family-weighted retest **82.4%**. Population baseline, ignoring the persona: **76.8%**. The paper's published ceiling is 81.72% on a different task average.
+- Pricing is the informative block: retest **83.9%**, population baseline **55.9%**. Base-rate, disease, Linda, outcome bias, and sunk cost sit within 2 points of the baseline. A persona cannot help much there.
+- Every wave 1–3 persona is about **24k** rough tokens (characters / 4), so above an 8k window and under 32k. The summary is about **13k** characters. `full_persona` text is longer because it includes wave-4 answers.
+- All 2,058 people have exactly one variant in each randomization family. Missing variants are the design.
+- Sex matches US adults (Census July 1 2024). Ages 50–64 are high by 9 points; 65+ is low by 9 points. Hispanic origin is 9.4% versus 18.5% of Census adults. The race item is a single choice, so it is not a Census race table.
 
-不做的：
+Not doing word frequency, word clouds, or clustering of persona text. The wording is shared. Forward Flow is a short elicitation (median 60 words).
 
-- 词频、词云、对 persona 文本做聚类。问卷措辞在所有人之间几乎相同，这些统计量反映的是题目原文，不是这个人。仅有的开放文本（例如 Forward Flow）单独看，不进入主分析。
-- 把年龄、人格分数拼成一个大向量当作主模型。表格模型只作为弱基线。
+# Representativeness and bias
 
-# 代表性与偏差
+Demographics are wave 1 only. Later waves are behavior.
 
-样本本身就是美国成年人，不用其他波次来判断一个人是不是成年人。对照只用 wave 1 的 Demographics：年龄段、生理性别、种族、学历、收入、地区、党派。基准用美国成年人人口统计（Census / ACS），或论文里已经给出的对照。Wave 2–4 是人格、认知、经济偏好和重测行为，不参与「像不像总体」这个判断。
+Two uses of sex, race, age, and education:
 
-偏差分两层写：
+- Describe who the panel is, against Census adults where the categories allow it.
+- Slice the same retest, and later the same model score. The slice is an audit. It is not a feature added to raise accuracy.
 
-- 样本偏差：只有美国、在线问卷；若种族、性别、学历或收入偏离总体，写明偏离方向。这限制了结论能推广到谁。
-- 误差偏差：模型和人类重测的差距，按性别、种族、年龄、学历拆开。看误差是不是集中在某一组。这些变量是审计切片。
+Do not use a score for credit, hiring, medicine, or any decision about a named person.
 
-种族和性别进入 persona，是因为它们是受访者自己的回答。它们不单独作为「提高准确率」的捷径，也不用于针对个人的信贷、招聘或医疗决定。
+# Methods
 
-# 方法
+Four ways to do this one prediction, in order of cost. Not four products.
 
-四级是同一道预测题上的四种做法，按成本和信息量往上加。不是四个互不相关的模型，也不必每个都训练出权重。
+0. Weak baselines: random, and the population constant already in the exploration report. A demographics-only table model comes in step 3.
+1. Official setup: persona text plus the new question, answered by a language model, parsed back to a survey code. Full text and summary.
+2. If the prompt does not fit: retrieve the prior answers relevant to the new question.
+3. Bonus: fine-tune a model under 0.5B parameters on some people. Held-out people only at test time. The prompt does not contain the earlier answer to that item, or the wave-4 answer.
 
-0. 弱基线：随机；多数类；只用人口学的表格模型。
-1. 官方做法：persona 全文或摘要，加上新题，让语言模型作答，再解析成问卷编码。这是主方案。
-2. 上下文装不下时：按新题检索最相关的几条旧问答，再放进 prompt。
-3. Bonus：小于 0.5B 的模型，在一部分人上学「persona + 题 → 答案」。测试的人不参与训练，输入里没有这道题的早期答案，也没有 wave 4 答案。
+Steps 0–2 are the plan. Step 3 waits until the scorer has been applied to a real model output.
 
-第 0–2 级写进方案并在一小片人上比较。第 3 级在前三级的指标已经能跑通之后再做。
+# Evaluation
 
-# 评估
+The yardstick stays fixed. GPT-4.1-mini is not the judge.
 
-打分函数固定，方法可以变。
+- Labels are wave-4 answers. The human ceiling is the retest on the same items, already computed.
+- The scorer is `twin2k.scoring`: exact match on binary items, `1 - |a - b| / span` otherwise, deciles for the unbounded anchoring estimates.
+- Every system is scored on the same people and the same items. What may change is the persona (full text, summary, retrieved excerpts) and, later, a small fine-tune.
+- GPT-4.1-mini is the official prompt system. Step 3 scores the published simulation files with this function. We do not call the API, and we do not ask a model to grade another model.
+- Acceptance: beat the population baseline on the families where that baseline is weak, especially pricing, and report the ratio to the human retest. Do not expect to pass the retest.
 
-- 标签永远是 wave 4 真值。人类上限用同题的早期答案对 wave 4 答案，在同一批人、同一批题上计算。
-- GPT-4.1-mini 是官方 prompt 基线，用数据集里的预计算结果，不重新调用 API，也不把它当作打分器。
-- 每次比较使用同一批人、同一批题、同一个准确率定义。可以改的是 persona 放全文还是摘要、是否检索、是否微调。
-- 验收：高于随机和人口学基线，并报告达到人类重测上限的比例。官方约 71.72% 的准确率、约 81.72% 的人类上限只作文献参照；自己这份切片上的数字以自己的代码为准。
+# Business
 
-# 业务与维护
+Amity already separates a survey twin from a customer twin.
 
-能用的场景是聚合的市场研究和问卷预测试，例如一批虚拟受访者对定价或促销的反应。不能用模拟结果对具体的人做信贷、招聘、医疗或执法决定。
+- HANDY, and the retail Large Behavior Model, learn from purchase logs. This file has no receipts. The pricing block is a stated grocery choice by a US online panel. It can dry-run a price question. It cannot forecast sales for a Thai or Southeast Asian retailer.
+- SAVVY needs each account's recent behavior to pick a next action. This file has no account timeline.
+- LIVELY needs call transcripts and policy text. Different inputs.
+- The usable job is aggregate research: simulate a panel on a new pricing or attitude item, then check it against a fresh human wave before spending on a real test.
 
-行为会变。监控按题型拆开的准确率与人类上限的差距；新一波真实回答到来，或某一组的误差明显变大时重训。persona 的构建规则、切分和打分函数一起做版本。
+Limits sit in the exploration results. The panel is US, English, and online. It is older in the middle and light on Hispanic respondents relative to Census adults. Stated purchase is not a receipt. Several classic experiments are already predicted by the popular answer, so a twin adds nothing there. People disagree with their own earlier answer about 18% of the time, which no model should be asked to beat. A new country, language, or retailer needs its own human wave, a recomputed ceiling, and a versioned persona builder. Retraining on a schedule, without new human answers, does not create that generalization.
 
-# 迭代顺序
+# Maintenance
 
-1. 仓库和任务定义（当前）。
-2. 探索 notebook：对齐、重测、变体缺失、长度、人口学对照。
-3. 固定打分函数，算出随机基线、人口学基线和官方 GPT-4.1-mini 基线。
-4. 全文 prompt 与摘要 prompt 的小规模比较。
-5. 有需要再做检索。
-6. 有余力再做小于 0.5B 的微调。
+Track retest gap by family and by sex, race, age, and education. Rebuild personas when a new human wave arrives, or when one group's gap versus its own retest widens. Version the persona rules, the person split, and the scorer together.
+
+# Order
+
+1. Task definition. Done.
+2. Exploration: alignment, retest, variants, length, demographics. Done.
+3. Point the same scorer at a demographics-only baseline and the published GPT-4.1-mini outputs.
+4. Small comparison of full-text prompt versus summary prompt.
+5. Retrieval only if the prompt still does not fit.
+6. Fine-tune under 0.5B parameters if the loop above is stable.
