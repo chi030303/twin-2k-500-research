@@ -32,3 +32,7 @@ Answer sheets download into `data/sim/` and are not committed.
 ## Bonus fine-tune
 
 [training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. GPT-4.1-mini is a system we score, not the judge.
+
+## License
+
+Code and writeups in this repository are [MIT](LICENSE). The Twin-2K-500 dataset is CC BY 4.0 and is not included here.

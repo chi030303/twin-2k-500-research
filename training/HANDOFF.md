@@ -13,6 +13,23 @@ Run it on the A100. The laptop does not need a GPU.
 - LoRA on `q_proj`, `k_proj`, `v_proj`, `o_proj`: rank 16, alpha 32, dropout 0.05. Learning rate 2e-4, 2 epochs, batch size 1, gradient accumulation 16, max length 2,048, warmup ratio 0.03, seed 0.
 - Eval decoding: temperature 0, 16 new tokens.
 
+## Data
+
+The dataset is not in the repo. `data/` is gitignored.
+
+This run reads one Hugging Face config, `LLM-Digital-Twin/Twin-2K-500` / `wave_split`, seven parquet shards, about 190MB. The first `--prepare-only` downloads them into `data/parquet/wave_split/` if that directory is empty. Nothing else has to be built by hand.
+
+Columns used:
+
+- `pid`
+- `wave1_3_persona_text` — the prompt. Questions that wave 4 repeats are already left out.
+- `wave4_Q_wave1_3_A` — the earlier answer. Used for the retest and the training-set baseline only.
+- `wave4_Q_wave4_A` — the label. Never copied into the prompt.
+
+`full_persona` is not downloaded. `Qwen/Qwen2.5-0.5B-Instruct` downloads on `--train`, not during `--prepare-only`.
+
+There is no git remote, so the server cannot `git pull` this repo. Copy the project directory. If the copy includes `data/parquet/wave_split/`, the download is skipped.
+
 ## Setup
 
 ```bash

@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pyarrow.dataset as ds
 
-from exploration.explore import ensure_parquets, family_of
+from exploration.explore import DATA, HF, download, family_of
 from twin2k.scoring import Item, agreement, items_from_blocks, normalize_block, parse_number
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,8 +97,14 @@ def format_question(question: dict, sub: int) -> tuple[str, str] | None:
     return None
 
 
+def ensure_wave_split() -> None:
+    for index in range(7):
+        name = f"{index:04d}.parquet"
+        download(f"{HF}/wave_split/data/{name}", DATA / "wave_split" / name)
+
+
 def load_rows() -> tuple[dict[int, str], list[dict]]:
-    ensure_parquets()
+    ensure_wave_split()
     frame = ds.dataset(ROOT / "data" / "parquet" / "wave_split", format="parquet").to_table(
         columns=["pid", "wave1_3_persona_text", "wave4_Q_wave1_3_A", "wave4_Q_wave4_A"]
     ).to_pandas()
