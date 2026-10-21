@@ -5,5 +5,6 @@ __pycache__/
 .env
 data/
 *.parquet
+training/outputs/
 .DS_Store
 Research_Engineer_Assignment.pdf

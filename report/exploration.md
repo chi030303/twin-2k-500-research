@@ -2,7 +2,7 @@
 
 Source: `LLM-Digital-Twin/Twin-2K-500`, config `wave_split`, all 2,058 people.
 Scorer: `twin2k.scoring`. Binary items are exact match. Other items are `1 - |a - b| / span`.
-Wide free-text numbers (the anchoring estimates) are mapped to deciles of the earlier answers before that formula, as in Toubia et al. 2025.
+Wide free-text numbers (the anchoring estimates) are mapped to deciles of the earlier answers before that formula. The formula and the 81.72% figure are from Toubia, Gui, Peng, Merlau, Li, and Chen, 2025, Twin-2K-500, arXiv:2505.17479 (Marketing Science, https://doi.org/10.1287/mksc.2025.0262).
 The population baseline predicts every person with the median, or the mode for a binary item, of the wave 1–3 answers. It does not use a persona.
 
 ## Why these two columns
@@ -78,7 +78,7 @@ Each family is a randomization group. One person is assigned one block name. A m
 
 ## Length
 
-Token counts are characters / 4, a rough English estimate, not a model tokenizer.
+Token counts are characters / 4. That is OpenAI's English rule of thumb (about 4 characters per token), not a count from a model tokenizer. The citable count is `tiktoken` for the GPT model in use, or that model's own tokenizer.
 Wave 1–3 persona: median 23801 tokens, 95th percentile 24064.
 Share over 8k tokens: 100.0%. Share over 32k: 0.0%.
 Median summary length: 12993 characters. Median `full_persona` text: 128665 characters, versus 95204 for the wave 1–3 persona.
@@ -165,6 +165,6 @@ This is the human ceiling inside the group, not a model error. A later model tab
 
 ## What this changes
 
-Use `wave_split` personas as model input. Score wave-4 answers with this function, on the same items, for every later system including the published GPT-4.1-mini runs.
-Do not impute the variant a person was not shown. A summary is worth trying: the full persona is long, and `full_persona` text is the wrong text.
-Pricing is the piece closest to a retail stated-preference test. Its retest, not the overall average, is the relevant ceiling for that use.
+Use `wave_split` personas as model input. Score every later system, including the published GPT-4.1-mini runs, with `twin2k.scoring.agreement`: exact match on binary items, and `1 - |a - b| / span` otherwise.
+Do not impute the variant a person was not shown. A summary is worth trying because the legal persona is long. `full_persona` text is the wrong input because repeated questions keep the wave-4 answer, so the label is already in the prompt.
+Pricing is a stated-preference item: the person says whether they would buy at a shown price. It is not a receipt, and it is not a chosen/rejected pair for preference tuning. Its retest, not the overall average, is the relevant ceiling for that use.

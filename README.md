@@ -6,7 +6,8 @@ Predict one person's wave-4 answers from the wave 1–3 answers that wave 4 does
 
 - [design.md](design.md) — task, method ladder, evaluation, business limits
 - [note.md](note.md) — block list by wave
-- [report/exploration.md](report/exploration.md) — step 2 results
+- [report/exploration.md](report/exploration.md) — human retest and the population baseline
+- [report/evaluation.md](report/evaluation.md) — published GPT-4.1-mini scored on wave 4
 
 Family-weighted human retest is **82.4%**. A constant taken from the earlier answers, with no persona, scores **76.8%**. Pricing is where the person matters (83.9% versus 55.9%). Several classic experiments are already explained by the popular answer.
 
@@ -20,6 +21,14 @@ python3 -m venv .venv
 
 Parquet files download into `data/` and are not committed. The scorer used for later models is `twin2k/scoring.py`.
 
-## Next
+## Reproduce the published-model scores
 
-Score the published GPT-4.1-mini simulations with the same function. That model is a baseline, not the judge.
+```bash
+.venv/bin/python -m evaluation.score_published
+```
+
+Answer sheets download into `data/sim/` and are not committed.
+
+## Bonus fine-tune
+
+[training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. GPT-4.1-mini is a system we score, not the judge.
