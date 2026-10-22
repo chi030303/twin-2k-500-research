@@ -8,6 +8,7 @@ Predict one person's wave-4 answers from the wave 1–3 answers that wave 4 does
 - [note.md](note.md) — block list by wave
 - [report/exploration.md](report/exploration.md) — human retest and the population baseline
 - [report/evaluation.md](report/evaluation.md) — published GPT-4.1-mini scored on wave 4
+- [report/finetune.md](report/finetune.md) — Qwen2.5-0.5B LoRA on the held-out 1,558
 
 Family-weighted human retest is **82.4%**. A constant taken from the earlier answers, with no persona, scores **76.8%**. Pricing is where the person matters (83.9% versus 55.9%). Several classic experiments are already explained by the popular answer.
 
@@ -31,7 +32,7 @@ Answer sheets download into `data/sim/` and are not committed.
 
 ## Bonus fine-tune
 
-[training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. GPT-4.1-mini is a system we score, not the judge.
+[training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. The held-out scores are in [report/finetune.md](report/finetune.md): family-weighted 70.2% against a training-set constant of 76.8%, and 73.7% against 55.9% on pricing. GPT-4.1-mini is a system we score, not the judge.
 
 ## License
 

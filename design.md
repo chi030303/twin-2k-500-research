@@ -66,7 +66,7 @@ Toubia et al. 2025, Table 2, already varies JSON, reasoning, temperature, Gemini
 
 ## Bonus fine-tune
 
-Not started. The loop is specified so it can be run after the table above.
+Done. Held-out scores, the training rows, and what to change next are in [report/finetune.md](report/finetune.md). Family-weighted, the adapter scores 70.2% against the training-set constant at 76.8%. On pricing it scores 73.7% against 55.9%. The next change is the persona budget, then which families carry loss. A full fine-tune waits until the prompt contains the person.
 
 - Base: [`Qwen/Qwen2.5-0.5B-Instruct`](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct). 0.49B parameters, context 32,768. Under the assignment cap of 0.5B. Qwen2.5-1.5B is over the cap. The instruct checkpoint is the one that can follow "reply with the option number."
 - Objective: next-token loss on the answer tokens only. Not DPO. The label is the person's wave-4 answer. There is no rejected answer, so there is no preference pair.

@@ -2,7 +2,24 @@
 
 Bonus only. The scored comparison is already in [report/evaluation.md](../report/evaluation.md). This run checks that a model under 0.5B can train and be scored. It is not required to beat GPT-4.1-mini.
 
-Run it on the A100. The laptop does not need a GPU.
+Run it on one A100 40GB. The laptop does not need a GPU.
+
+## Machine
+
+The trainer is one process with batch size 1. A node has four A100 40GB cards and can share them. This run uses one card. Extra cards do not shorten it.
+
+Driver 535 supports CUDA through 12.2. `pip install torch` with no index installs a wheel built for CUDA 12.4 or newer, and that wheel needs driver 550 or newer. The install succeeds, then `import torch` fails with an insufficient-driver error. Use the CUDA 12.1 wheel, which runs on driver 535. Install it last: `requirements-train.txt` lists `torch` with no version, and a current Transformers release can depend on a newer torch. Either one replaces the 12.1 wheel if it is installed afterwards.
+
+```bash
+pip install -r requirements.txt
+pip install "transformers==4.51.3" "peft==0.15.2" "accelerate==1.6.0"
+pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+python -c "import torch; assert torch.version.cuda.startswith('12.1') and torch.cuda.is_available()"
+```
+
+The wheel carries its own CUDA libraries. A newer CUDA toolkit on `LD_LIBRARY_PATH` is not part of this setup.
+
+The full run is 47,948 training rows from the 500, then 149,632 scored rows from the 1,558. See [report/finetune.md](../report/finetune.md). On one A100, plan on 6 to 12 hours, including the download and the 24-person smoke. A wall-clock cap of 12 hours covers that range. A 24 hour cap is only the kill limit. The card is released when the script exits, not when the cap expires. Scoring on this card uses `--eval-batch 32`. Decoding stays temperature 0 and 16 new tokens.
 
 ## What is trained
 
@@ -36,9 +53,12 @@ There is no git remote, so the server cannot `git pull` this repo. Copy the proj
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pip install torch  # skip this if the machine already has a CUDA torch
 pip install -r requirements-train.txt
+pip install --force-reinstall torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+python -c "import torch; assert torch.version.cuda.startswith('12.1') and torch.cuda.is_available()"
 ```
+
+`requirements-train.txt` lists `torch` with no version. The reinstall has to come after it, or a newer wheel replaces the CUDA 12.1 build.
 
 If `huggingface.co` is slow:
 
@@ -53,7 +73,7 @@ Weights and parquet download on first run. Neither is committed.
 ```bash
 python -m training.finetune --prepare-only
 python -m training.finetune --train --eval --limit-people 24 --epochs 1 --max-length 512
-python -m training.finetune --train --eval
+python -m training.finetune --train --eval --eval-batch 32
 ```
 
 `--prepare-only` checks the split, the item count, and that wave-4 question stems are absent from the persona. It does not load the model.
@@ -70,7 +90,7 @@ python -m training.finetune --train --eval
 - Each is family-weighted and item-weighted. Pricing is its own row.
 - Decile edges for anchoring use the training people's earlier answers, not the full 2,058.
 
-The 76.8% and 55.9% figures in the report are fit on everyone. This run's baseline is fit on the 500. Compare the model with `baseline` in `metrics.json`, then with the published full text only as context.
+The 76.8% and 55.9% figures in [report/evaluation.md](../report/evaluation.md) are fit on everyone. This run's baseline is fit on the 500. The held-out comparison is written up in [report/finetune.md](../report/finetune.md).
 
 The run is acceptable when `metrics.json` exists and `model.family` is filled on the held-out people. Beating the training-set baseline on pricing is a good result. Beating 66.9%, or the retest, is not required.
 
