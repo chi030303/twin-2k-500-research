@@ -45,7 +45,7 @@ Columns used:
 
 `full_persona` is not downloaded. `Qwen/Qwen2.5-0.5B-Instruct` downloads on `--train`, not during `--prepare-only`.
 
-There is no git remote, so the server cannot `git pull` this repo. Copy the project directory. If the copy includes `data/parquet/wave_split/`, the download is skipped.
+The repo is [chi030303/twin-2k-500-research](https://github.com/chi030303/twin-2k-500-research). Clone it. `data/` is not in the repo. If a copy already has `data/parquet/wave_split/`, the download is skipped. The held-out scores are committed at `training/outputs/qwen-0.5b-lora/metrics.json`. Adapter weights are not in git.
 
 ## Setup
 
@@ -98,4 +98,4 @@ The run is acceptable when `metrics.json` exists and `model.family` is filled on
 
 - Put `full_persona`, `wave4_Q_wave4_A`, or `wave4_Q_wave1_3_A` into the prompt.
 - Train on a test pid, including after a later wave.
-- Commit `training/outputs/` or `data/`.
+- Commit adapter weights, checkpoints, or `data/`. `training/outputs/qwen-0.5b-lora/metrics.json` is committed so the held-out scores can be checked.

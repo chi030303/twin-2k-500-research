@@ -5,6 +5,9 @@ __pycache__/
 .env
 data/
 *.parquet
-training/outputs/
+training/outputs/*
+!training/outputs/qwen-0.5b-lora/
+training/outputs/qwen-0.5b-lora/*
+!training/outputs/qwen-0.5b-lora/metrics.json
 .DS_Store
 Research_Engineer_Assignment.pdf

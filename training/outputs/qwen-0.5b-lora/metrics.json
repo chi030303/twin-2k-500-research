@@ -1,0 +1,82 @@
+{
+  "retest": {
+    "family": 0.8234344323998797,
+    "item": 0.8321428200147324,
+    "n": 149632,
+    "by_family": {
+      "Absolute vs relative": 0.7849807445442876,
+      "Allais": 0.7342747111681643,
+      "Anchoring, African countries": 0.7991014120667522,
+      "Anchoring, redwood": 0.8359720439309657,
+      "Base-rate": 0.8372849807445443,
+      "Disease": 0.8037227214377407,
+      "False consensus": 0.8731386392811297,
+      "Less is more": 0.7767971758664955,
+      "Linda": 0.8222935387248609,
+      "Myside": 0.8485237483953787,
+      "Non-experimental heuristics": 0.8457635857937527,
+      "Outcome bias": 0.8646769362430466,
+      "Pricing": 0.8374037227214377,
+      "Probability matching": 0.7430555555555556,
+      "Proportion dominance 1": 0.8735558408215661,
+      "Proportion dominance 2": 0.8577663671373557,
+      "Sunk cost": 0.7922657252888318,
+      "WTA/WTP": 0.8912423334759664
+    },
+    "fail": 0.007906062874251498
+  },
+  "baseline": {
+    "family": 0.7682894115896695,
+    "item": 0.6919041455778918,
+    "n": 149632,
+    "by_family": {
+      "Absolute vs relative": 0.7150192554557124,
+      "Allais": 0.6322207958921694,
+      "Anchoring, African countries": 0.7558836114676938,
+      "Anchoring, redwood": 0.7822528883183568,
+      "Base-rate": 0.8338767650834403,
+      "Disease": 0.8173299101412067,
+      "False consensus": 0.761007702182285,
+      "Less is more": 0.7153401797175867,
+      "Linda": 0.8265725288831834,
+      "Myside": 0.8026957637997432,
+      "Non-experimental heuristics": 0.8088439238339752,
+      "Outcome bias": 0.8563329054343175,
+      "Pricing": 0.5594833119383825,
+      "Probability matching": 0.766044061302682,
+      "Proportion dominance 1": 0.8032734274711169,
+      "Proportion dominance 2": 0.780423620025674,
+      "Sunk cost": 0.7766367137355584,
+      "WTA/WTP": 0.8359720439309657
+    },
+    "fail": 0.007906062874251498
+  },
+  "model": {
+    "family": 0.7018020682878737,
+    "item": 0.7494529839131261,
+    "n": 149632,
+    "by_family": {
+      "Absolute vs relative": 0.7150192554557124,
+      "Allais": 0.6290115532734275,
+      "Anchoring, African countries": 0.7537797746398517,
+      "Anchoring, redwood": 0.6957281414919412,
+      "Base-rate": 0.6129396662387677,
+      "Disease": 0.8029525032092426,
+      "False consensus": 0.7812901155327343,
+      "Less is more": 0.6437740693196405,
+      "Linda": 0.827428326914848,
+      "Myside": 0.8065468549422335,
+      "Non-experimental heuristics": 0.7939077877620881,
+      "Outcome bias": 0.2604835258878905,
+      "Pricing": 0.7367137355584082,
+      "Probability matching": 0.766044061302682,
+      "Proportion dominance 1": 0.8016688061617459,
+      "Proportion dominance 2": 0.7598202824133503,
+      "Sunk cost": 0.7766367137355584,
+      "WTA/WTP": 0.468692055341606
+    },
+    "fail": 0.007906062874251498
+  },
+  "n_test_people": 1558,
+  "n_train_people": 500
+}
