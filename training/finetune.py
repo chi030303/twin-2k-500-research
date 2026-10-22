@@ -410,15 +410,27 @@ def evaluate(args, personas, rows, train_pids, test_pids, edges, adapter: Path) 
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     train_pids, test_pids, rows = subset_rows(rows, train_pids, test_pids, args.limit_people)
+    if args.test_people:
+        test_pids = set(random.Random(0).sample(sorted(test_pids), min(args.test_people, len(test_pids))))
     tokenizer = AutoTokenizer.from_pretrained(adapter)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"
-    base = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto")
+    # Training drops overflow from the front. Cutting the end would drop the question.
+    tokenizer.truncation_side = "left"
+    if torch.cuda.is_available():
+        device, dtype = "cuda", torch.bfloat16
+    elif torch.backends.mps.is_available():
+        device, dtype = "mps", torch.bfloat16
+    else:
+        device, dtype = "cpu", torch.float32
+    base = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=dtype, device_map={"": device})
     model = PeftModel.from_pretrained(base, str(adapter))
     model.eval()
     prefixes = {pid: persona_prefix(tokenizer, personas[pid], args.max_length - 256) for pid in test_pids}
     test_rows = [row for row in rows if row["pid"] in test_pids]
+    if args.families:
+        test_rows = [row for row in test_rows if row["family"] in args.families]
     decoded: list[str] = []
     batch = args.eval_batch
     for start in range(0, len(test_rows), batch):
@@ -479,11 +491,16 @@ def evaluate(args, personas, rows, train_pids, test_pids, edges, adapter: Path) 
         "n_train_people": len(train_pids),
     }
     adapter.mkdir(parents=True, exist_ok=True)
-    (adapter / "metrics.json").write_text(json.dumps(metrics, indent=2))
+    name = "metrics_partial.json" if args.families or args.test_people else "metrics.json"
+    (adapter / name).write_text(json.dumps(metrics, indent=2))
+    with (adapter / "replies.jsonl").open("w") as handle:
+        for row, text in zip(test_rows, decoded):
+            record = {"pid": row["pid"], "qid": row["qid"], "sub": row["sub"], "reply": text}
+            handle.write(json.dumps(record) + "\n")
     model_family = metrics["model"]["family"]
     base_family = metrics["baseline"]["family"]
     print(f"test family model {model_family:.4f} baseline {base_family:.4f} retest {metrics['retest']['family']:.4f}")
-    print(f"wrote {adapter / 'metrics.json'}")
+    print(f"wrote {adapter / name}")
 
 
 def main() -> None:
@@ -498,6 +515,8 @@ def main() -> None:
     parser.add_argument("--limit-people", type=int, default=0)
     parser.add_argument("--eval-batch", type=int, default=8)
     parser.add_argument("--adapter", type=Path, default=None)
+    parser.add_argument("--families", nargs="+", default=None, help="score only these families")
+    parser.add_argument("--test-people", type=int, default=0, help="score a seeded sample of test people")
     args = parser.parse_args()
     personas, rows, train_pids, test_pids, edges = prepare(args)
     if args.prepare_only and not args.train and not args.eval:

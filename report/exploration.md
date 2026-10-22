@@ -1,22 +1,23 @@
 # Wave-split exploration
 
-Source: `LLM-Digital-Twin/Twin-2K-500`, config `wave_split`, all 2,058 people.
-Scorer: `twin2k.scoring`. Binary items are exact match. Other items are `1 - |a - b| / span`.
-Wide free-text numbers (the anchoring estimates) are mapped to deciles of the earlier answers before that formula. The formula and the 81.72% figure are from Toubia, Gui, Peng, Merlau, Li, and Chen, 2025, Twin-2K-500, arXiv:2505.17479 (Marketing Science, https://doi.org/10.1287/mksc.2025.0262).
-The population baseline predicts every person with the median, or the mode for a binary item, of the wave 1–3 answers. It does not use a persona.
+Source: `LLM-Digital-Twin/Twin-2K-500`, config `wave_split`, all 2,058 people. Scorer: `twin2k.scoring`. Binary items are exact match. Other items are `1 - |a - b| / span`.
+Anchoring estimates are mapped to deciles of the earlier answers before that formula. The formula, and the 81.72% figure, are from Toubia, Gui, Peng, Merlau, Li, and Chen, 2025, Twin-2K-500, arXiv:2505.17479 (Marketing Science, https://doi.org/10.1287/mksc.2025.0262).
+The population baseline is the median of the earlier answers, or the mode on a binary item. No persona.
 
-## Why these two columns
+## The two subsets
 
-Wave 4 is one instrument stored twice. `wave4_Q_wave1_3_A` is that instrument filled with the earlier answers. `wave4_Q_wave4_A` is the same instrument filled in wave 4.
-The elements in the docs (False consensus through Pricing) are blocks inside both JSON values. Aligning anything else would mix different questions.
-Persona text is the input, not a third answer key: it keeps wave 1–3 questions that wave 4 does not ask again.
+`full_persona` is one row per person with all four waves: `persona_text`, `persona_summary`, and `persona_json`. On repeated questions it keeps the wave-4 answer. `wave_split` is the prediction split: `wave1_3_persona_text` and `wave1_3_persona_json` leave out what wave 4 repeats, and the wave-4 questions are stored twice, with the earlier answers and with the wave-4 answers. Both have 2,058 rows.
+
+## The two wave-4 columns
+
+`wave4_Q_wave1_3_A` and `wave4_Q_wave4_A` are the same instrument filled at two times. False consensus through Pricing are blocks inside both. The persona is the input: wave 1–3 questions that wave 4 does not ask again.
 
 ## Retest
 
 Scored items: 197,580. Item-weighted retest 83.3%; population baseline 69.2%.
-Family-weighted retest 82.4%; population baseline 76.8%. This is the headline. Pricing alone has 40 binary items and would otherwise dominate.
+Family-weighted retest 82.4%; population baseline 76.8%. Pricing has 40 items per person, so the family mean is the headline.
 Pricing retest 83.9% against a population baseline of 55.9%.
-Toubia et al. 2025 report a human test-retest of 81.72% on their task average. The family-weighted figure above is close. It is not the same statistic: this table scores every sub-item, then gives each family equal weight.
+Toubia et al. 2025 report 81.72% test-retest on their task average. The family mean here scores every sub-item, then gives each family equal weight.
 
 | Family | Items | People | Retest | Population baseline |
 | --- | ---: | ---: | ---: | ---: |
@@ -47,13 +48,13 @@ Toubia et al. 2025 report a human test-retest of 81.72% on their task average. T
 | te | 2,058 | 78.8% | 78.2% |
 | te-decile | 4,116 | 81.3% | 73.4% |
 
-Families where the population baseline is within 2 points of retest: Sunk cost, Disease, Linda, Base-rate, Outcome bias. A persona has little room to beat a constant there.
-Families where retest leads the baseline by at least 15 points: Pricing. Individual answers carry more information than the popular answer.
-Families where the baseline beats retest by more than 2 points: Probability matching. People are less stable than the popular answer.
+Baseline within 2 points of retest: Sunk cost, Disease, Linda, Base-rate, Outcome bias.
+Retest ahead by at least 15 points: Pricing.
+Baseline ahead by more than 2 points: Probability matching.
 
 ## Variants
 
-Each family is a randomization group. One person is assigned one block name. A missing variant is the design, not a value to impute.
+Each family is one randomization group, and each person has one block name. A missing variant stays empty.
 
 | Family | People with exactly one variant | Distinct block names |
 | --- | ---: | ---: |
@@ -78,19 +79,19 @@ Each family is a randomization group. One person is assigned one block name. A m
 
 ## Length
 
-Token counts are characters / 4. That is OpenAI's English rule of thumb (about 4 characters per token), not a count from a model tokenizer. The citable count is `tiktoken` for the GPT model in use, or that model's own tokenizer.
+Token counts are characters / 4, OpenAI's English rule of thumb, not a tokenizer count.
 Wave 1–3 persona: median 23801 tokens, 95th percentile 24064.
 Share over 8k tokens: 100.0%. Share over 32k: 0.0%.
 Median summary length: 12993 characters. Median `full_persona` text: 128665 characters, versus 95204 for the wave 1–3 persona.
-`full_persona` text is longer because repeated questions keep the wave-4 answer. It is not a valid model input for this task.
-Forward Flow, the open-text block in the persona, has median 60 words (95th percentile 62). Word clouds of the rest of the persona would mostly repeat the question wording.
+`full_persona` text is longer because repeated questions keep the wave-4 answer.
+Forward Flow median 60 words (95th percentile 62). The rest of the persona repeats the question wording.
 
 ## Who is in the sample
 
-Demographics come from wave 1 only. Later waves are behavior, not a check that someone is an adult.
+Demographics are wave 1. Later waves are behavior.
 Age and sex benchmark: US Census Bureau, National Population Estimates, July 1 2024, nc-est2024-agesex-res.csv.
 Race and Hispanic origin: US Census Bureau resident population by age, July 2025, nc-est2024-alldata-r-file12.csv. Hispanic is H_MALE + H_FEMALE in that file.
-The survey asks race or origin as one choice, so White, Black, Asian, Hispanic, and Other sum to 100%. Census race and Hispanic origin overlap. White on the survey is not the same bucket as non-Hispanic White alone. Gaps below are directional.
+Race or origin is one choice, so those sample shares sum to 100%. Census race and Hispanic origin overlap. White on the survey is a different bucket from non-Hispanic White alone. The gaps are directional.
 
 | Group | Sample | Census adults | Sample minus Census |
 | --- | ---: | ---: | ---: |
@@ -105,7 +106,7 @@ The survey asks race or origin as one choice, so White, Black, Asian, Hispanic, 
 | Asian vs Asian alone | 6.8% | 7.0% | -0.2 pp |
 | Hispanic vs Hispanic, any race | 9.4% | 18.5% | -9.0 pp |
 
-Sample composition with no Census twin (question wording differs, or Census does not ask):
+Sample shares with no Census counterpart:
 
 **education**
 
@@ -141,7 +142,7 @@ Sample composition with no Census twin (question wording differs, or Census does
 
 ## Retest by group
 
-This is the human ceiling inside the group, not a model error. A later model table should use the same split.
+Human retest inside the group. A later model table can use the same split.
 
 | Slice | People | Retest |
 | --- | ---: | ---: |
@@ -163,8 +164,7 @@ This is the human ceiling inside the group, not a model error. A later model tab
 | education: Postgraduate | 313 | 83.3% |
 | education: Some college, no degree | 468 | 83.4% |
 
-## What this changes
+## Use
 
-Use `wave_split` personas as model input. Score every later system, including the published GPT-4.1-mini runs, with `twin2k.scoring.agreement`: exact match on binary items, and `1 - |a - b| / span` otherwise.
-Do not impute the variant a person was not shown. A summary is worth trying because the legal persona is long. `full_persona` text is the wrong input because repeated questions keep the wave-4 answer, so the label is already in the prompt.
-Pricing is a stated-preference item: the person says whether they would buy at a shown price. It is not a receipt, and it is not a chosen/rejected pair for preference tuning. Its retest, not the overall average, is the relevant ceiling for that use.
+Model input is the `wave_split` persona. Score with `twin2k.scoring.agreement`. Leave the unseen variant empty. `full_persona` text keeps the wave-4 answer on repeated questions.
+Pricing is a stated yes or no at a shown price. The ceiling for that block is its own retest.

@@ -2,7 +2,7 @@
 
 Source: [persona_json structure](https://digital-twin-simulation-version2.readthedocs.io/en/latest/intro/index.html#structure-of-the-persona-json-file).
 
-That page documents `full_persona`, not `wave_split`. One row is one person. `persona_json` is a list of blocks. A block belongs to one wave. Order can be fixed or randomized, and some blocks are shown only under an experimental condition. Wave 4 does this the most. The list below is every block that exists, not the blocks one person saw.
+The page documents `full_persona`. One row is one person. `persona_json` is a list of blocks, one wave each. Order can be fixed or randomized, and some blocks appear only under a condition. Wave 4 does this the most. The list below is every block that exists.
 
 `full_persona` fields:
 
@@ -11,7 +11,7 @@ That page documents `full_persona`, not `wave_split`. One row is one person. `pe
 - `persona_summary` — short text summary
 - `persona_json` — blocks, questions, answers
 
-`wave_split` is the prediction split. Persona text there excludes questions that wave 4 asks again. Wave 4 itself is stored twice: `wave4_Q_wave1_3_A` (earlier answers) and `wave4_Q_wave4_A` (wave-4 answers). The elements below are the blocks inside those JSON values.
+`wave_split` is the prediction split. Its persona text leaves out questions wave 4 asks again. Wave 4 is stored twice: `wave4_Q_wave1_3_A` (earlier answers) and `wave4_Q_wave4_A` (wave-4 answers). The elements below are the blocks inside those JSON values.
 
 Element numbers follow the docs page.
 

@@ -1,12 +1,12 @@
 # Fine-tune handoff
 
-Bonus only. The scored comparison is already in [report/evaluation.md](../report/evaluation.md). This run checks that a model under 0.5B can train and be scored. It is not required to beat GPT-4.1-mini.
+Bonus only. The scored comparison is in [report/evaluation.md](../report/evaluation.md). This run trains a model under 0.5B and scores it. Beating GPT-4.1-mini is optional.
 
-Run it on one A100 40GB. The laptop does not need a GPU.
+One A100 40GB. The laptop does not need a GPU.
 
 ## Machine
 
-The trainer is one process with batch size 1. A node has four A100 40GB cards and can share them. This run uses one card. Extra cards do not shorten it.
+One process, batch size 1, one card. Extra cards on the node sit idle.
 
 Driver 535 supports CUDA through 12.2. `pip install torch` with no index installs a wheel built for CUDA 12.4 or newer, and that wheel needs driver 550 or newer. The install succeeds, then `import torch` fails with an insufficient-driver error. Use the CUDA 12.1 wheel, which runs on driver 535. Install it last: `requirements-train.txt` lists `torch` with no version, and a current Transformers release can depend on a newer torch. Either one replaces the 12.1 wheel if it is installed afterwards.
 
@@ -45,7 +45,7 @@ Columns used:
 
 `full_persona` is not downloaded. `Qwen/Qwen2.5-0.5B-Instruct` downloads on `--train`, not during `--prepare-only`.
 
-The repo is [chi030303/twin-2k-500-research](https://github.com/chi030303/twin-2k-500-research). Clone it. `data/` is not in the repo. If a copy already has `data/parquet/wave_split/`, the download is skipped. The held-out scores are committed at `training/outputs/qwen-0.5b-lora/metrics.json`. Adapter weights are not in git. They are [chi10969/twin2k-qwen2.5-0.5b-lora](https://huggingface.co/chi10969/twin2k-qwen2.5-0.5b-lora).
+Clone [chi030303/twin-2k-500-research](https://github.com/chi030303/twin-2k-500-research). An existing `data/parquet/wave_split/` skips the download. Held-out scores are committed at `training/outputs/qwen-0.5b-lora/metrics.json`. Adapter weights are [chi10969/twin2k-qwen2.5-0.5b-lora](https://huggingface.co/chi10969/twin2k-qwen2.5-0.5b-lora).
 
 ## Setup
 
@@ -88,11 +88,12 @@ python -m training.finetune --train --eval --eval-batch 32
 - `baseline`: mode, or median, fit on the 500 training people only, scored on the test people's wave-4 answers.
 - `model`: the adapter on those same test rows.
 - Each is family-weighted and item-weighted. Pricing is its own row.
+- `replies.jsonl` next to it holds the raw reply for each scored row. `--families` and `--test-people` score a subset and write `metrics_partial.json` instead. The committed `replies.jsonl` and `metrics_partial.json` are the 400-person rescore in [report/finetune.md](../report/finetune.md).
 - Decile edges for anchoring use the training people's earlier answers, not the full 2,058.
 
 The 76.8% and 55.9% figures in [report/evaluation.md](../report/evaluation.md) are fit on everyone. This run's baseline is fit on the 500. The held-out comparison is written up in [report/finetune.md](../report/finetune.md).
 
-The run is acceptable when `metrics.json` exists and `model.family` is filled on the held-out people. Beating the training-set baseline on pricing is a good result. Beating 66.9%, or the retest, is not required.
+The run is acceptable when `metrics.json` has `model.family` on the held-out people. A pricing gain over the training-set baseline is a good result. The published full-text 66.9% and the retest are context.
 
 ## Do not
 

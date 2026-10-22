@@ -9,5 +9,7 @@ training/outputs/*
 !training/outputs/qwen-0.5b-lora/
 training/outputs/qwen-0.5b-lora/*
 !training/outputs/qwen-0.5b-lora/metrics.json
+!training/outputs/qwen-0.5b-lora/metrics_partial.json
+!training/outputs/qwen-0.5b-lora/replies.jsonl
 .DS_Store
 Research_Engineer_Assignment.pdf

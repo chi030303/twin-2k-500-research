@@ -1,10 +1,10 @@
 # Published GPT-4.1-mini
 
-Scored with `twin2k.scoring` on every wave-4 item. The model answers are the dataset's precomputed completions. No API call.
+Scored with `twin2k.scoring` on every wave-4 item, using the dataset's published completions.
 
-The submitted number is accuracy against the wave-4 answer. The wave 1–3 column is the target those files were generated for. It is not averaged with the wave-4 number.
+Report accuracy against the wave-4 answer. The wave 1–3 column is the target those files were built for. The two stay separate.
 
-Family-weighted means give each family the same weight. Item-weighted means let pricing, about 42% of items, dominate. Toubia et al. 2025 report 71.72% for the text persona on a 17-task average. The figure below is this scorer on these items. It is not that average.
+Each family has equal weight in the family mean. The item mean lets pricing, about 42% of items, dominate. Toubia et al. 2025 report 71.72% for the text persona on a 17-task average. This table is this scorer on these items.
 
 | System | Input | Family-weighted, wave 4 | Item-weighted, wave 4 | Ratio to retest | Family-weighted, wave 1–3 | Unparsed |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -14,9 +14,9 @@ Family-weighted means give each family the same weight. Item-weighted means let 
 | Summary persona | summary | 69.6% | 68.0% | 84% | 69.0% | 0.0% |
 | Full text persona | text persona | 73.5% | 71.7% | 89% | 72.7% | 0.0% |
 
-Ratio to retest uses the family-weighted wave-4 score. The wave 1–3 column is only for a model completion, scored against the earlier answer. Unparsed is the share of those completions that were not a number. Retest and the population constant are computed from the human answers, so both cells are marked —.
+Ratio to retest is the family-weighted wave-4 score. The wave 1–3 column scores a completion against the earlier answer. Unparsed is completions with no number. Retest and the constant are human answers, marked —.
 
-On the family-weighted average the full text persona, 73.5%, is below the population constant, 76.8%. The constant wins on most families. The persona wins on pricing. Pricing is large enough that the item-weighted average goes the other way: full text 71.7%, population constant 69.2%.
+On the family mean, full text (73.5%) sits under the population constant (76.8%). The constant is ahead on most families. Full text is ahead on pricing. Pricing is large enough that the item mean goes the other way: full text 71.7%, constant 69.2%.
 
 | Family | Items | Retest | Population | Demographics | Summary | Full text | Text minus population |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -39,9 +39,9 @@ On the family-weighted average the full text persona, 73.5%, is below the popula
 | Non-experimental heuristics | 41,160 | 84.5% | 80.9% | 73.5% | 72.1% | 76.2% | -4.7 pp |
 | Pricing | 82,320 | 83.9% | 55.9% | 58.8% | 62.7% | 66.9% | +11.0 pp |
 
-Pricing is the family the exploration flagged. Full text scores 66.9% against a population constant of 55.9% and a retest of 83.9%.
+Full text on pricing is 66.9%, against a population constant of 55.9% and a retest of 83.9%.
 
-Purchase rate is the share of pricing answers coded yes. Quintiles are within each product, so a high quintile is a high price for that product, not a high price in dollars across products.
+Purchase rate is the share of pricing answers coded yes. Quintiles are within each product: a high quintile is a high price for that product.
 
 | Price quintile | Human wave 4 | Demographics | Summary | Full text |
 | --- | ---: | ---: | ---: | ---: |
@@ -51,4 +51,4 @@ Purchase rate is the share of pricing answers coded yes. Quintiles are within ea
 | 4 | 27.3% | 64.8% | 49.7% | 17.0% |
 | 5 | 16.9% | 39.7% | 26.4% | 7.6% |
 
-Human purchase rates fall from 74.6% in the cheapest fifth to 16.9% in the dearest. Full text sits below the human rate in every fifth. Demographics sits above the human rate in every fifth. The summary sits above the human rate in every fifth.
+Human purchase rates fall from 74.6% in the cheapest fifth to 16.9% in the dearest. Full text sits below the human rate in every fifth. Demographics and the summary sit above the human rate in every fifth.

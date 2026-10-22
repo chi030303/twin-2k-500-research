@@ -243,11 +243,11 @@ def write_report(pairs: pd.DataFrame, by_family: pd.DataFrame, demand: pd.DataFr
     lines = [
         "# Published GPT-4.1-mini",
         "",
-        "Scored with `twin2k.scoring` on every wave-4 item. The model answers are the dataset's precomputed completions. No API call.",
+        "Scored with `twin2k.scoring` on every wave-4 item, using the dataset's published completions.",
         "",
-        "The submitted number is accuracy against the wave-4 answer. The wave 1–3 column is the target those files were generated for. It is not averaged with the wave-4 number.",
+        "Report accuracy against the wave-4 answer. The wave 1–3 column is the target those files were built for. The two stay separate.",
         "",
-        "Family-weighted means give each family the same weight. Item-weighted means let pricing, about 42% of items, dominate. Toubia et al. 2025 report 71.72% for the text persona on a 17-task average. The figure below is this scorer on these items. It is not that average.",
+        "Each family has equal weight in the family mean. The item mean lets pricing, about 42% of items, dominate. Toubia et al. 2025 report 71.72% for the text persona on a 17-task average. This table is this scorer on these items.",
         "",
         "| System | Input | Family-weighted, wave 4 | Item-weighted, wave 4 | Ratio to retest | Family-weighted, wave 1–3 | Unparsed |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
@@ -276,12 +276,12 @@ def write_report(pairs: pd.DataFrame, by_family: pd.DataFrame, demand: pd.DataFr
     lines.extend(
         [
             "",
-            "Ratio to retest uses the family-weighted wave-4 score. The wave 1–3 column is only for a model completion, scored against the earlier answer. Unparsed is the share of those completions that were not a number. Retest and the population constant are computed from the human answers, so both cells are marked —.",
+            "Ratio to retest is the family-weighted wave-4 score. The wave 1–3 column scores a completion against the earlier answer. Unparsed is completions with no number. Retest and the constant are human answers, marked —.",
             "",
             (
-                f"On the family-weighted average the full text persona, {pct(text_family)}, is below the population constant, {pct(base_family)}. "
-                "The constant wins on most families. The persona wins on pricing. "
-                f"Pricing is large enough that the item-weighted average goes the other way: full text {pct(text_item)}, population constant {pct(base_item)}."
+                f"On the family mean, full text ({pct(text_family)}) sits under the population constant ({pct(base_family)}). "
+                "The constant is ahead on most families. Full text is ahead on pricing. "
+                f"Pricing is large enough that the item mean goes the other way: full text {pct(text_item)}, constant {pct(base_item)}."
             ),
             "",
             "| Family | Items | Retest | Population | Demographics | Summary | Full text | Text minus population |",
@@ -298,9 +298,9 @@ def write_report(pairs: pd.DataFrame, by_family: pd.DataFrame, demand: pd.DataFr
     lines.extend(
         [
             "",
-            f"Pricing is the family the exploration flagged. Full text scores {pct(pricing.text)} against a population constant of {pct(pricing.base_rate)} and a retest of {pct(pricing.retest)}.",
+            f"Full text on pricing is {pct(pricing.text)}, against a population constant of {pct(pricing.base_rate)} and a retest of {pct(pricing.retest)}.",
             "",
-            "Purchase rate is the share of pricing answers coded yes. Quintiles are within each product, so a high quintile is a high price for that product, not a high price in dollars across products.",
+            "Purchase rate is the share of pricing answers coded yes. Quintiles are within each product: a high quintile is a high price for that product.",
             "",
             "| Price quintile | Human wave 4 | Demographics | Summary | Full text |",
             "| --- | ---: | ---: | ---: | ---: |",
@@ -312,19 +312,32 @@ def write_report(pairs: pd.DataFrame, by_family: pd.DataFrame, demand: pd.DataFr
         )
     cheap, dear = demand.iloc[0], demand.iloc[-1]
 
-    def placement(column: str) -> str:
+    def side(column: str) -> str:
         if bool((demand[column] < demand["human"]).all()):
-            return "sits below the human rate in every fifth"
+            return "below"
         if bool((demand[column] > demand["human"]).all()):
-            return "sits above the human rate in every fifth"
-        return "crosses the human rate"
+            return "above"
+        return "crosses"
 
+    names = {"text": "Full text", "demographics": "Demographics", "summary": "the summary"}
+    grouped: dict[str, list[str]] = {"below": [], "above": [], "crosses": []}
+    for column, label in names.items():
+        grouped[side(column)].append(label)
+
+    def clause(labels: list[str], where: str) -> str:
+        subject = labels[0] if len(labels) == 1 else " and ".join(labels)
+        verb = "sits" if len(labels) == 1 else "sit"
+        if where == "crosses":
+            return f"{subject} crosses the human rate"
+        return f"{subject} {verb} {where} the human rate in every fifth"
+
+    detail = ". ".join(clause(labels, where) for where, labels in grouped.items() if labels)
     lines.extend(
         [
             "",
             (
                 f"Human purchase rates fall from {pct(float(cheap.human))} in the cheapest fifth to {pct(float(dear.human))} in the dearest. "
-                f"Full text {placement('text')}. Demographics {placement('demographics')}. The summary {placement('summary')}."
+                f"{detail}."
             ),
             "",
         ]
@@ -332,7 +345,8 @@ def write_report(pairs: pd.DataFrame, by_family: pd.DataFrame, demand: pd.DataFr
     REPORT.write_text("\n".join(lines))
 
 
-def main() -> None:
+def build_pairs() -> tuple[pd.DataFrame, dict[str, tuple]]:
+    """Human pairs with the population constant, retest, and each published arm."""
     ensure_parquets()
     ensure_sheets()
     wave = ds.dataset(ROOT / "data" / "parquet" / "wave_split", format="parquet").to_table(
@@ -361,6 +375,11 @@ def main() -> None:
     pairs["retest"] = retest
     for name, _ in ARMS:
         attach_arm(pairs, column_to_key, edges, name)
+    return pairs, column_to_key
+
+
+def main() -> None:
+    pairs, column_to_key = build_pairs()
     demand = purchase_rates(pairs, column_to_key)
     by_family = (
         pairs.groupby("family", sort=False)
