@@ -1,6 +1,6 @@
 # Qwen2.5-0.5B LoRA
 
-Scored with `twin2k.scoring` on the held-out people. The raw file is [`training/outputs/qwen-0.5b-lora/metrics.json`](../training/outputs/qwen-0.5b-lora/metrics.json). The 24-person smoke run is a separate directory and is not in this table. Adapter weights are not in git.
+Scored with `twin2k.scoring` on the held-out people. The raw file is [`training/outputs/qwen-0.5b-lora/metrics.json`](../training/outputs/qwen-0.5b-lora/metrics.json). The 24-person smoke run is a separate directory and is not in this table. Adapter weights are not in git. They are [chi10969/twin2k-qwen2.5-0.5b-lora](https://huggingface.co/chi10969/twin2k-qwen2.5-0.5b-lora).
 
 The constant here is fit on the 500 training people and scored on the 1,558. The 76.8% and 55.9% in [evaluation.md](evaluation.md) are fit on all 2,058. Several of those rounded figures match. The fits are separate.
 

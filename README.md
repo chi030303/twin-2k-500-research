@@ -32,7 +32,7 @@ Answer sheets download into `data/sim/` and are not committed.
 
 ## Bonus fine-tune
 
-[training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. The held-out scores are in [report/finetune.md](report/finetune.md): family-weighted 70.2% against a training-set constant of 76.8%, and 73.7% against 55.9% on pricing. GPT-4.1-mini is a system we score, not the judge.
+[training/HANDOFF.md](training/HANDOFF.md). Run that on a GPU. It trains `Qwen2.5-0.5B-Instruct` on 500 people and scores the other 1,558. The held-out scores are in [report/finetune.md](report/finetune.md): family-weighted 70.2% against a training-set constant of 76.8%, and 73.7% against 55.9% on pricing. The adapter is [chi10969/twin2k-qwen2.5-0.5b-lora](https://huggingface.co/chi10969/twin2k-qwen2.5-0.5b-lora). GPT-4.1-mini is a system we score, not the judge.
 
 ## License
 

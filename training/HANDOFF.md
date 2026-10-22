@@ -45,7 +45,7 @@ Columns used:
 
 `full_persona` is not downloaded. `Qwen/Qwen2.5-0.5B-Instruct` downloads on `--train`, not during `--prepare-only`.
 
-The repo is [chi030303/twin-2k-500-research](https://github.com/chi030303/twin-2k-500-research). Clone it. `data/` is not in the repo. If a copy already has `data/parquet/wave_split/`, the download is skipped. The held-out scores are committed at `training/outputs/qwen-0.5b-lora/metrics.json`. Adapter weights are not in git.
+The repo is [chi030303/twin-2k-500-research](https://github.com/chi030303/twin-2k-500-research). Clone it. `data/` is not in the repo. If a copy already has `data/parquet/wave_split/`, the download is skipped. The held-out scores are committed at `training/outputs/qwen-0.5b-lora/metrics.json`. Adapter weights are not in git. They are [chi10969/twin2k-qwen2.5-0.5b-lora](https://huggingface.co/chi10969/twin2k-qwen2.5-0.5b-lora).
 
 ## Setup
 
